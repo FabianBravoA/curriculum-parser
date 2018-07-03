@@ -15,3 +15,4 @@ course-parser 01-intro/README.md --validate
 # valida todos los cursos de una malla currícular (cada curso en una carpeta)
 course-parser */README.md --validate
 ```
+
