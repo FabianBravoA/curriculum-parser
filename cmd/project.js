@@ -1,21 +1,23 @@
-const path = require('path');
 const project = require('../lib/project');
 
-
 module.exports = app => project(
-  path.resolve(app.args.shift()),
+  app.args.shift(),
   app.opts,
 );
 
 
 module.exports.args = [
-  { name: 'dir', required: true },
+  { name: 'path', required: true },
 ];
 
 module.exports.options = [
-  { name: 'repo', required: true },
+  { name: 'repository', required: true },
   { name: 'version', required: true },
   { name: 'locale', required: true },
   { name: 'track', required: true },
   { name: 'rubric', required: true },
+  { name: 'commit', required: true },
+  { name: 'branch', required: true },
+  { name: 'userName', required: true },
+  { name: 'accessToken', required: true },
 ];

@@ -25,6 +25,7 @@ const success = (value) => {
 
 
 const error = (err) => {
+  console.error(chalk.red(err.stack))
   console.error(chalk.red(err.message));
 
   if (err.name === 'ValidationError') {
