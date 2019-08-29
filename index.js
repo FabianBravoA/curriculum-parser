@@ -94,7 +94,7 @@ internals.partFormats = {
 internals.validPartFormats = internals.uniqueObjValues(internals.partFormats);
 
 //Assuming accessToken has repo access to github
-internals.processGihubLink = (path, commit, userName, repository, accessToken, cb) => {
+internals.processGithubLink = (path, commit, userName, repository, accessToken, cb) => {
   let parsedCourse = {
     course : null,
     syllabus : {}
@@ -331,7 +331,7 @@ module.exports = {
       }
       cb(null, Stats(internals.reduce(internals.applyGlobalOptions(results, opts))));
     }),
-  github : internals.processGihubLink
+  github : internals.processGithubLink
 }
 
 let printResult = (err, result, opts) => {
