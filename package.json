@@ -1,24 +1,35 @@
 {
-  "name": "course-parser",
-  "version": "1.1.0",
-  "license": "UNLICENSED",
-  "private": true,
+  "name": "curriculum-parser",
+  "version": "2.0.0-alpha.5",
+  "license": "MIT",
   "bin": {
-    "course-parser": "./index.js"
+    "curriculum-parser": "./index.js"
+  },
+  "engines": {
+    "node": ">=8.3.0"
   },
   "scripts": {
-    "test": "jest test/*.spec.js --verbose"
+    "pretest": "eslint .",
+    "test": "jest test/*.spec.js --verbose --coverage",
+    "link-models": "rm -rf node_modules/models && ln -s ../../models ./node_modules/models",
+    "changelog": "git log $(git describe --tags --abbrev=0)..HEAD --oneline --format=\"* %h %s (%an <%ae>)\""
   },
   "dependencies": {
-    "async": "^2.6.0",
     "axios": "^0.18.0",
-    "chalk": "^2.3.1",
-    "cheerio": "^1.0.0-rc.2",
-    "marked": "^0.3.12",
-    "minimist": "^1.2.0"
+    "chalk": "^2.4.2",
+    "cheerio": "^1.0.0-rc.3",
+    "marked": "^0.7.0",
+    "minimist": "^1.2.0",
+    "models": "Laboratoria/models#v1.0.0-alpha.10",
+    "mongoose": "^5.6.9",
+    "rubric": "Laboratoria/rubric#v2.3.1",
+    "semver": "^6.3.0"
   },
   "devDependencies": {
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "jest": "^22.3.0"
+    "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
+    "eslint": "^6.1.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "jest": "^24.9.0"
   }
 }

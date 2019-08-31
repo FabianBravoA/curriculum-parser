@@ -1,102 +1,114 @@
-'use strict';
+const mongoose = require('mongoose');
+const models = require('models')(mongoose);
+const helpers = require('./helpers');
+const course = require('../lib/course');
 
 
-const Helpers = require('./helpers');
-const Course = require('../lib/course');
-
-
-describe('Course(path, cb)', () => {
-
-  it('should log error when README.md is empty', done => Course(
-    Helpers.resolveFixtureDirReadmePath('00-course-empty'),
-    (err, data) => {
-      expect(err).toBe(null);
-      expect(data.result.slug).toBe('course-empty');
-      expect(data.result.order).toBe(0);
-      expect(data.log.length).toBe(1);
-      expect(data.log[0]).toEqual([
-        Helpers.resolveFixtureDirReadmePath('00-course-empty'),
-        'error',
-        'README.md del curso course-empty está vacío!'
-      ]);
-      done();
-    }
+describe('course', () => {
+  it('should reject with error when dir doesnt exist', () => (
+    course('foo', models)
+      .catch((err) => {
+        expect(err.message).toMatch(/no such file or directory/);
+        expect(err.code).toBe('ENOENT');
+      })
   ));
 
-  it('should log error when README.md doesnt start with h1', done => Course(
-    Helpers.resolveFixtureDirReadmePath('01-course-no-title'),
-    (err, data) => {
-      expect(err).toBe(null);
-      expect(data.result.slug).toBe('course-no-title');
-      expect(data.result.order).toBe(1);
-      expect(data.log.length).toBe(1);
-      expect(data.log[0]).toEqual([
-        Helpers.resolveFixtureDirReadmePath('01-course-no-title'),
-        'error',
-        'README.md del curso course-no-title debe empezar con un h1 con el título del curso!'
-      ]);
-      done();
-    }
+  it('should reject when README.md is empty', () => (
+    course(helpers.resolveFixturePath('00-course-empty'), models, {
+      track: 'js',
+      locale: 'es-ES',
+    })
+      .catch((err) => {
+        expect(err.message).toBe('README.md del curso está vacío');
+        expect(err.path).toBe(helpers.resolveFixtureDirReadmePath('00-course-empty'));
+      })
   ));
 
-  it('should have empty tags if not found', done => Course(
-    Helpers.resolveFixtureDirReadmePath('02-course-no-tags'),
-    (err, data) => {
-      expect(err).toBe(null);
-      expect(data.result.order).toBe(2);
-      expect(data.result.tags).toMatchSnapshot();
-      done();
-    }
+  it('should reject when README.md doesnt start with h1', () => (
+    course(helpers.resolveFixturePath('01-course-no-title'), models, {
+      track: 'js',
+      locale: 'es-ES',
+    })
+      .catch((err) => {
+        expect(err.message).toBe('README.md del curso debe empezar con un h1 con el título del curso');
+        expect(err.path).toBe(helpers.resolveFixtureDirReadmePath('01-course-no-title'));
+      })
   ));
 
-  it('should read primary (default) tags', done => Course(
-    Helpers.resolveFixtureDirReadmePath('02-course-tags'),
-    (err, data) => {
-      expect(err).toBe(null);
-      expect(data.result.order).toBe(2);
-      expect(data.result.tags).toMatchSnapshot();
-      done();
-    }
+  it('should have empty tags if not found', () => (
+    course(helpers.resolveFixturePath('02-course-no-tags'), models, {
+      repo: 'Laboratoria/curricula-js',
+      version: '2.0.0',
+      track: 'js',
+      locale: 'es-ES',
+    })
+      .then(data => expect(data.tags).toMatchSnapshot())
   ));
 
-  it('should read main and secondary tags', done => Course(
-    Helpers.resolveFixtureDirReadmePath('02-course-secondary-tags'),
-    (err, data) => {
-      expect(err).toBe(null);
-      expect(data.result.order).toBe(2);
-      expect(data.result.tags).toMatchSnapshot();
-      done();
-    }
+  it('should read primary (default) tags', () => (
+    course(helpers.resolveFixturePath('02-course-tags'), models, {
+      repo: 'Laboratoria/curricula-js',
+      version: '2.0.0',
+      track: 'js',
+      locale: 'es-ES',
+    })
+      .then(data => expect(data.tags).toMatchSnapshot())
   ));
 
-  it('should parse with target audience', done => Course(
-    Helpers.resolveFixtureDirReadmePath('02-course-with-target-audience'),
-    (err, data) => {
-      expect(err).toBe(null);
-      expect(data.result.order).toBe(2);
-      expect(data.result.tags).toMatchSnapshot();
-      expect(data.result.targetAudience).toMatchSnapshot();
-      done();
-    }
+  it('should read main and secondary tags', () => (
+    course(helpers.resolveFixturePath('02-course-secondary-tags'), models, {
+      repo: 'Laboratoria/curricula-js',
+      version: '2.0.0',
+      track: 'js',
+      locale: 'es-ES',
+    })
+      .then(data => expect(data.tags).toMatchSnapshot())
   ));
 
-  it('should parse grades (evaluación) section', done => Course(
-    Helpers.resolveFixtureDirReadmePath('03-course-with-grades'),
-    (err, data) => {
-      expect(err).toBe(null);
-      expect(data).toMatchSnapshot();
-      done();
-    }
+  it('should parse with target audience', () => (
+    course(helpers.resolveFixturePath('02-course-with-target-audience'), models, {
+      repo: 'Laboratoria/curricula-js',
+      version: '2.0.0',
+      track: 'js',
+      locale: 'es-ES',
+    })
+      .then((data) => {
+        expect(data.tags).toMatchSnapshot();
+        expect(data.targetAudience).toMatchSnapshot();
+      })
   ));
 
-  it('should trim <hr> from html fragments', done => Course(
-    Helpers.resolveFixtureDirReadmePath('03-course-with-grades'),
-    (err, data) => {
-      expect(err).toBe(null);
-      expect(data.result.syllabus.pop().description).toMatchSnapshot();
-      expect(data.result.product).toMatchSnapshot();
-      done();
-    }
+  it('should parse grades (evaluación) section', () => (
+    course(helpers.resolveFixturePath('03-course-with-grades'), models, {
+      repo: 'Laboratoria/curricula-js',
+      version: '2.0.0',
+      track: 'js',
+      locale: 'es-ES',
+    })
+      .then(data => expect(data.grades).toMatchSnapshot())
   ));
 
+  it('should trim <hr> from html fragments', () => (
+    course(helpers.resolveFixturePath('03-course-with-grades'), models, {
+      repo: 'Laboratoria/curricula-js',
+      version: '2.0.0',
+      track: 'js',
+      locale: 'es-ES',
+    })
+      .then(data => expect(data.product).toMatchSnapshot())
+  ));
+
+  it('should validate units and parts', () => (
+    course(helpers.resolveFixturePath('course-with-invalid-unit'), models, {
+      repo: 'Laboratoria/curricula-js',
+      version: '2.0.0',
+      track: 'js',
+      locale: 'es-ES',
+    })
+      .catch((err) => {
+        expect(err.name).toBe('ValidationError');
+        expect(err.message)
+          .toBe('TopicUnitPart validation failed: type: Path `type` is required.');
+      })
+  ));
 });
