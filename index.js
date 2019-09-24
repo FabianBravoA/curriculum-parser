@@ -1,5 +1,4 @@
 #! /usr/bin/env node
-'use strict';
 
 const minimist = require('minimist');
 const chalk = require('chalk');
