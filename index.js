@@ -4,7 +4,7 @@ const minimist = require('minimist');
 const chalk = require('chalk');
 const mongoose = require('mongoose');
 const models = require('models')(mongoose);
-const { hasOwnProperty } = require('./lib/common');
+const { hasOwnProperty, isGithubUrl } = require('./lib/common');
 const pkg = require('./package.json');
 
 
@@ -59,6 +59,15 @@ module.exports = (args, opts) => {
   if (opts.h || opts.help || cmdName === 'help') {
     return commands.help({ pkg, commands })
       .then(success, error);
+  }
+
+  const isGithubRepoUrl = isGithubUrl(args[0]);
+  if (isGithubRepoUrl && !opts.token) {
+    return error(new Error('Missing access token. Get one at https://github.com/settings/tokens'));
+  }
+
+  if (isGithubRepoUrl && !opts.branch) {
+    return error(new Error('Missing branch'));
   }
 
   const requiredArgs = (commands[cmdName].args || []).reduce(
